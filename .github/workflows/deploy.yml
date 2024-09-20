@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   test:
@@ -59,9 +56,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Deploy application
-        env:
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        run: |
-          # Add your deployment script here
-          echo "Deploying application..."
+      - name: Deploy application to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERFECT_ANGULAR }}
+          channelId: live
+          projectId: perfect-angular
