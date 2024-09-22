@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  reCaptchaSiteKey: process.env['RECAPTCHA_SITE_KEY'] ?? '',
+  reCaptchaSiteKey: import.meta.env.RECAPTCHA_SITE_KEY,
 };
