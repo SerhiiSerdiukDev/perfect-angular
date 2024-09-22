@@ -19,14 +19,7 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { environment } from '../environments/environment';
 
-const firabaseApp = initializeApp({
-  projectId: 'perfect-angular',
-  appId: '***REMOVED***',
-  storageBucket: 'perfect-angular.appspot.com',
-  apiKey: '***REMOVED***',
-  authDomain: 'perfect-angular.firebaseapp.com',
-  messagingSenderId: '***REMOVED***',
-});
+const firabaseApp = initializeApp(environment.firebaseConfig);
 
 export const appConfig: ApplicationConfig = {
   providers: [

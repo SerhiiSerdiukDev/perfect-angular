@@ -36,9 +36,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Add .env file
+      - name: Add environment variables to .env file
         run: |
-          echo "NG_APP_RECAPTCHA_SITE_KEY=${{ secrets.RECAPTCHA_SITE_KEY }}" > .env
+          echo "NG_APP_RECAPTCHA_SITE_KEY=${{ secrets.NG_APP_RECAPTCHA_SITE_KEY }}
+                NG_APP_FIREBASE_PROJECT_ID=${{ secrets.NG_APP_FIREBASE_PROJECT_ID }}
+                NG_APP_FIREBASE_APP_ID=${{ secrets.NG_APP_FIREBASE_APP_ID }}
+                NG_APP_FIREBASE_STORAGE_BUCKET=${{ secrets.NG_APP_FIREBASE_STORAGE_BUCKET }}
+                NG_APP_FIREBASE_API_KEY=${{ secrets.NG_APP_FIREBASE_API_KEY }}
+                NG_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.NG_APP_FIREBASE_AUTH_DOMAIN }}
+                NG_APP_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NG_APP_FIREBASE_MESSAGING_SENDER_ID }}
+          " > .env
 
       - name: Install dependencies and build
         run: |
