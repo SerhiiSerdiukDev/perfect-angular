@@ -1,5 +1,6 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { environment } from '../environments/environment';
 
 import { routes } from './app.routes';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -38,7 +39,7 @@ export const appConfig: ApplicationConfig = {
     UserTrackingService,
     provideAppCheck(() => {
       const provider = new ReCaptchaEnterpriseProvider(
-        '6LdGREsqAAAAAEAPSS6g4d3P3hTS2t7-B-b6gK5S'
+        environment.reCaptchaSiteKey
       );
       return initializeAppCheck(undefined, {
         provider,

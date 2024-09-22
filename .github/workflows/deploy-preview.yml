@@ -43,13 +43,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies and build
+        env:
+          RECAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_SITE_KEY }}
         run: |
           npm ci
           npm run build
 
-      - name: Deploy to a new preview channel in the Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERFECT_ANGULAR }}
-          projectId: perfect-angular
+      # - name: Deploy to a new preview channel in the Firebase Hosting
+      #   uses: FirebaseExtended/action-hosting-deploy@v0
+      #   with:
+      #     repoToken: ${{ secrets.GITHUB_TOKEN }}
+      #     firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERFECT_ANGULAR }}
+      #     projectId: perfect-angular
