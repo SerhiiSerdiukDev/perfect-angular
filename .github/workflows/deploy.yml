@@ -47,7 +47,6 @@ jobs:
       - name: Add environment variables to .env file
         run: |
           echo "NG_APP_RECAPTCHA_SITE_KEY=${{ secrets.NG_APP_RECAPTCHA_SITE_KEY }}
-                NG_APP_FIREBASE_PROJECT_ID=${{ secrets.NG_APP_FIREBASE_PROJECT_ID }}
                 NG_APP_FIREBASE_APP_ID=${{ secrets.NG_APP_FIREBASE_APP_ID }}
                 NG_APP_FIREBASE_STORAGE_BUCKET=${{ secrets.NG_APP_FIREBASE_STORAGE_BUCKET }}
                 NG_APP_FIREBASE_API_KEY=${{ secrets.NG_APP_FIREBASE_API_KEY }}
