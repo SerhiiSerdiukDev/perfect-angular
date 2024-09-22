@@ -44,7 +44,7 @@ jobs:
 
       - name: Add .env file
         run: |
-          echo "RECAPTCHA_SITE_KEY=${{ secrets.RECAPTCHA_SITE_KEY }}" > .env
+          echo "NG_APP_RECAPTCHA_SITE_KEY=${{ secrets.RECAPTCHA_SITE_KEY }}" > .env
 
       - name: Install dependencies and build
         run: |
