@@ -19,20 +19,20 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { environment } from '../environments/environment';
 
+const firabaseApp = initializeApp({
+  projectId: 'perfect-angular',
+  appId: '***REMOVED***',
+  storageBucket: 'perfect-angular.appspot.com',
+  apiKey: '***REMOVED***',
+  authDomain: 'perfect-angular.firebaseapp.com',
+  messagingSenderId: '***REMOVED***',
+});
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideFirebaseApp(() =>
-      initializeApp({
-        projectId: 'perfect-angular',
-        appId: '***REMOVED***',
-        storageBucket: 'perfect-angular.appspot.com',
-        apiKey: '***REMOVED***',
-        authDomain: 'perfect-angular.firebaseapp.com',
-        messagingSenderId: '***REMOVED***',
-      })
-    ),
+    provideFirebaseApp(() => firabaseApp),
     provideAuth(() => getAuth()),
     provideAnalytics(() => getAnalytics()),
     ScreenTrackingService,
@@ -41,7 +41,7 @@ export const appConfig: ApplicationConfig = {
       const provider = new ReCaptchaEnterpriseProvider(
         environment.reCaptchaSiteKey
       );
-      return initializeAppCheck(undefined, {
+      return initializeAppCheck(firabaseApp, {
         provider,
         isTokenAutoRefreshEnabled: true,
       });
