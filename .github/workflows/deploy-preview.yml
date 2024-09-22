@@ -42,9 +42,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Add .env file
+        run: |
+          echo "RECAPTCHA_SITE_KEY=${{ secrets.RECAPTCHA_SITE_KEY }}" > .env
+
       - name: Install dependencies and build
-        env:
-          RECAPTCHA_SITE_KEY: ${{ secrets.RECAPTCHA_SITE_KEY }}
         run: |
           npm ci
           npm run build
