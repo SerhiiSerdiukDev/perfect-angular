@@ -19,13 +19,11 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { environment } from '../environments/environment';
 
-const firabaseApp = initializeApp(environment.firebaseConfig);
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideFirebaseApp(() => firabaseApp),
+    provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideAuth(() => getAuth()),
     provideAnalytics(() => getAnalytics()),
     ScreenTrackingService,
@@ -34,7 +32,7 @@ export const appConfig: ApplicationConfig = {
       const provider = new ReCaptchaEnterpriseProvider(
         environment.reCaptchaSiteKey
       );
-      return initializeAppCheck(firabaseApp, {
+      return initializeAppCheck(undefined, {
         provider,
         isTokenAutoRefreshEnabled: true,
       });
