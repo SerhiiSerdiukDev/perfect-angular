@@ -10,12 +10,12 @@ module.exports = function (config) {
       require("@angular-devkit/build-angular/plugins/karma"),
     ],
     files: ["src/**/*.spec.ts"],
-    reporters: ["progress", "kjhtml"],
+    reporters: ["progress", "coverage"],
     coverageReporter: {
       dir: "coverage",
       reporters: [
         { type: "html", subdir: "report-html" },
-        { type: "text-summary", subdir: ".", file: "coverage-summary.txt" },
+        { type: "json-summary", subdir: ".", file: "coverage-summary.json" },
         { type: "text-summary" },
       ],
     },
