@@ -1,8 +1,6 @@
 name: Deploy to Firebase Hosting on PR
 
 on:
-  workflow_dispatch:
-
   pull_request:
     branches:
       - main
@@ -30,50 +28,98 @@ jobs:
       - name: Run tests
         run: npm run test:ci
 
+      - name: Upload coverage summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary
+          path: coverage/coverage-summary.json
+
+  update_pr:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download coverage summary
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-summary
+
+      - name: Parse full coverage details
+        id: update_pr
+        run: |
+          # Extract coverage details using jq
+          LINES=$(jq '.total.lines.pct' coverage-summary.json)
+          BRANCHES=$(jq '.total.branches.pct' coverage-summary.json)
+          FUNCTIONS=$(jq '.total.functions.pct' coverage-summary.json)
+          STATEMENTS=$(jq '.total.statements.pct' coverage-summary.json)
+
+          echo "Lines Coverage: $LINES%"
+          echo "Branches Coverage: $BRANCHES%"
+          echo "Functions Coverage: $FUNCTIONS%"
+          echo "Statements Coverage: $STATEMENTS%"
+
+          # Set outputs for the next step
+          echo "lines=$LINES" >> $GITHUB_OUTPUT
+          echo "branches=$BRANCHES" >> $GITHUB_OUTPUT
+          echo "functions=$FUNCTIONS" >> $GITHUB_OUTPUT
+          echo "statements=$STATEMENTS" >> $GITHUB_OUTPUT
+
       - name: Update PR with coverage summary
         uses: actions/github-script@v7
+        env:
+          COVERAGE: |
+            ## Test Coverage Summary
+            | Metric      | Coverage |
+            |-------------|----------|
+            | **Lines**   | `${{ steps.update_pr.outputs.lines }}%` |
+            | **Branches**| `${{ steps.update_pr.outputs.branches }}%` |
+            | **Functions**| `${{ steps.update_pr.outputs.functions }}%` |
+            | **Statements**| `${{ steps.update_pr.outputs.statements }}%` |
         with:
           script: |
+            const { COVERAGE } = process.env
             const fs = require('fs');
-            const summary = fs.readFileSync('coverage/coverage-summary.txt', 'utf8');
             const prNumber = context.issue.number;
-            const { data: pr } = await github.pulls.get({
+            const { data: pr } = await github.rest.pulls.get({
               ...context.repo,
               pull_number: prNumber
             });
-            const updatedBody = `${pr.body}\n\n## Test Coverage Summary\n\n${summary}`;
-            await github.pulls.update({
+            const prBody = pr.body.replace(/\#\# Test Coverage[\s\S\n\r]*/g, '');
+            const updatedBody = `${prBody}\n\n${COVERAGE}`;
+            await github.rest.pulls.update({
               ...context.repo,
               pull_number: prNumber,
               body: updatedBody
             });
 
-  # build_and_preview:
-  #   if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
-  #   runs-on: ubuntu-latest
-  #   needs: test
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+  build_and_preview:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Add environment variables to .env file
-  #       run: |
-  #         echo "NG_APP_RECAPTCHA_SITE_KEY=${{ secrets.NG_APP_RECAPTCHA_SITE_KEY }}
-  #               NG_APP_FIREBASE_APP_ID=${{ secrets.NG_APP_FIREBASE_APP_ID }}
-  #               NG_APP_FIREBASE_STORAGE_BUCKET=${{ secrets.NG_APP_FIREBASE_STORAGE_BUCKET }}
-  #               NG_APP_FIREBASE_API_KEY=${{ secrets.NG_APP_FIREBASE_API_KEY }}
-  #               NG_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.NG_APP_FIREBASE_AUTH_DOMAIN }}
-  #               NG_APP_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NG_APP_FIREBASE_MESSAGING_SENDER_ID }}
-  #         " > .env
+      - name: Add environment variables to .env file
+        run: |
+          echo "NG_APP_RECAPTCHA_SITE_KEY=${{ secrets.NG_APP_RECAPTCHA_SITE_KEY }}
+                NG_APP_FIREBASE_APP_ID=${{ secrets.NG_APP_FIREBASE_APP_ID }}
+                NG_APP_FIREBASE_STORAGE_BUCKET=${{ secrets.NG_APP_FIREBASE_STORAGE_BUCKET }}
+                NG_APP_FIREBASE_API_KEY=${{ secrets.NG_APP_FIREBASE_API_KEY }}
+                NG_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.NG_APP_FIREBASE_AUTH_DOMAIN }}
+                NG_APP_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NG_APP_FIREBASE_MESSAGING_SENDER_ID }}
+          " > .env
 
-  #     - name: Install dependencies and build
-  #       run: |
-  #         npm ci
-  #         npm run build
+      - name: Install dependencies and build
+        run: |
+          npm ci
+          npm run build
 
-  #     - name: Deploy to a new preview channel in the Firebase Hosting
-  #       uses: FirebaseExtended/action-hosting-deploy@v0
-  #       with:
-  #         repoToken: ${{ secrets.GITHUB_TOKEN }}
-  #         firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERFECT_ANGULAR }}
-  #         projectId: perfect-angular
+      - name: Deploy to a new preview channel in the Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PERFECT_ANGULAR }}
+          projectId: perfect-angular
