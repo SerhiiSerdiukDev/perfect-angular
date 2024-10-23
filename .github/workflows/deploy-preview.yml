@@ -68,7 +68,7 @@ jobs:
               ...context.repo,
               pull_number: prNumber
             });
-            const prBody = pr.body.replace(/\#\# Test Coverage[\s\S\n\r]*/g, '');
+            const prBody = (pr.body || '').replace(/\#\# Test Coverage[\s\S\n\r]*/g, '');
             const updatedBody = `${prBody}\n\n${COVERAGE}`;
             await github.rest.pulls.update({
               ...context.repo,
