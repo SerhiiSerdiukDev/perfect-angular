@@ -13,6 +13,8 @@ permissions:
 jobs:
   test:
     uses: ./.github/workflows/test.yml
+    with:
+      artifact-name: "coverage-report"
 
   update_pr:
     needs: test
@@ -24,7 +26,7 @@ jobs:
       - name: Download coverage summary
         uses: actions/download-artifact@v4
         with:
-          name: coverage-summary
+          name: coverage-report
 
       - name: Parse full coverage details
         id: update_pr

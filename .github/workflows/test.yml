@@ -3,6 +3,8 @@ name: Run tests
 on:
   workflow_call:
   pull_request:
+    branches-ignore:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
